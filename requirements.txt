@@ -5,6 +5,8 @@ Flask-JWT-Extended
 Flask-Migrate
 Flask-Restful
 Flask-Script
+Flask-Testing
 Flask-SQLAlchemy
 psycopg2-binary
 requests
+Werkzeug==0.16.0
