@@ -6,7 +6,7 @@ import unittest
 from flask_script import Manager, Server, Command, Option
 from flask_migrate import Migrate, MigrateCommand
 
-from project.server import app, db
+from project.server import app, db, models
 
 migrate = Migrate(app, db)
 manager = Manager(app)

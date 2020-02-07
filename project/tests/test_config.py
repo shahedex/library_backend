@@ -18,7 +18,7 @@ class TestDevelopmentConfig(TestCase):
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(current_app is None)
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://appscodeUser:appscodeUser_password@localhost:5432/library_db'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://appscodeuser:appscodeUser_password@localhost:5432/library_db'
         )
 
 class TestTestingConfig(TestCase):
@@ -30,7 +30,7 @@ class TestTestingConfig(TestCase):
         self.assertFalse(app.config['SECRET_KEY'] is 'my_precious')
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://appscodeUser:appscodeUser_password@localhost:5432/library_db_test'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://appscodeuser:appscodeUser_password@localhost:5432/library_db_test'
         )
 
 class TestProductionConfig(TestCase):
