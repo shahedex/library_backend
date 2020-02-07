@@ -3,11 +3,12 @@
 import os
 
 POSTGRES_SERVER_NAME = os.environ.get('POSTGRES_SERVER_NAME')
+POSTGRES_SERVER_PORT = os.environ.get('POSTGRES_SERVER_PORT')
 POSTGRES_USER_NAME = os.environ.get('POSTGRES_USER_NAME')
 POSTGRES_USER_PASS = os.environ.get('POSTGRES_USER_PASS')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-postgres_local_base = 'postgresql://' + POSTGRES_USER_NAME +':' + POSTGRES_USER_PASS + '@' + POSTGRES_SERVER_NAME + ':5432/'
+postgres_local_base = 'postgresql://' + POSTGRES_USER_NAME +':' + POSTGRES_USER_PASS + '@' + POSTGRES_SERVER_NAME + ':' + POSTGRES_SERVER_PORT + '/'
 database_name = 'library_db'
 
 

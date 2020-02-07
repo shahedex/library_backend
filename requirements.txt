@@ -1,4 +1,4 @@
-bcrypt
+# bcrypt
 Flask
 Flask-CORS
 Flask-JWT-Extended
@@ -6,6 +6,7 @@ Flask-Migrate
 Flask-Restful
 Flask-Script
 Flask-Testing
+Flask-Bcrypt
 Flask-SQLAlchemy
 psycopg2-binary
 requests
