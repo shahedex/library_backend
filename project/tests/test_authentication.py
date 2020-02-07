@@ -111,15 +111,18 @@ class TestAuthBlueprint(BaseTestCase):
     def test_user_status(self):
         with self.client:
             resp_register = self.client.post(
-                '/auth/register',
+                '/api/v1/auth/register',
                 data=json.dumps(dict(
-                    email='joe@gmail.com',
-                    password='123456'
+                    email='monty@gmail.com',
+                    password='123456',
+                    first_name='monty',
+                    last_name='python',
+                    is_admin='0'
                 )),
                 content_type='application/json'
             )
             response = self.client.get(
-                '/auth/status',
+                '/api/v1/auth/status',
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
                         resp_register.data.decode()
@@ -129,8 +132,7 @@ class TestAuthBlueprint(BaseTestCase):
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['data'] is not None)
-            self.assertTrue(data['data']['email'] == 'joe@gmail.com')
-            self.assertTrue(data['data']['admin'] is 'true' or 'false')
+            self.assertTrue(data['data']['email'] == 'monty@gmail.com')
             self.assertEqual(response.status_code, 200)
 
     def test_valid_logout(self):

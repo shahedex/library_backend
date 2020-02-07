@@ -158,10 +158,51 @@ class LogoutAPI(MethodView):
             }
             return make_response(jsonify(responseObject)), 403
 
-            
+
+class UserStatusAPI(MethodView):
+    def get(self):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            try:
+                auth_token = auth_header.split(" ")[1]
+            except IndexError:
+                responseObject = {
+                    'status': 'fail',
+                    'message': 'Bearer token malformed.'
+                }
+                return make_response(jsonify(responseObject)), 401
+        else:
+            auth_token = ''
+        if auth_token:
+            resp = User.decode_auth_token(auth_token)
+            if not isinstance(resp, str):
+                user = User.query.filter_by(id=resp).first()
+                responseObject = {
+                    'status': 'success',
+                    'data': {
+                        'user_id': user.id,
+                        'email': user.email,
+                        'is_admin': user.is_admin
+                    }
+                }
+                return make_response(jsonify(responseObject)), 200
+            responseObject = {
+                'status': 'fail',
+                'message': resp
+            }
+            return make_response(jsonify(responseObject)), 401
+        else:
+            responseObject = {
+                'status': 'fail',
+                'message': 'Provide a valid auth token.'
+            }
+            return make_response(jsonify(responseObject)), 401
+
+
 registration_view = RegisterAPI.as_view('register_api')
 login_view = LoginAPI.as_view('login_api')
 logout_view = LogoutAPI.as_view('logout_api')
+user_status_view = UserStatusAPI.as_view('user_status_api')
 
 
 auth_blueprint.add_url_rule(
@@ -180,4 +221,10 @@ auth_blueprint.add_url_rule(
     '/api/v1/auth/logout',
     view_func=logout_view,
     methods=['POST']
+)
+
+auth_blueprint.add_url_rule(
+    '/api/v1/auth/status',
+    view_func=user_status_view,
+    methods=['GET']
 )
