@@ -109,7 +109,7 @@ class Books(db.Model):
     isbn = db.Column(db.String(255), unique=True, nullable=False)
     summary = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, name, author, created_at, isbn, summary):
+    def __init__(self, name, author, isbn, summary):
         self.name = name
         self.author = author
         self.created_at = datetime.now()
