@@ -7,7 +7,6 @@ Flask-Restful
 Flask-Script
 Flask-Testing
 Flask-SQLAlchemy
-Flask-Bcrypt
 psycopg2-binary
 requests
 SQLAlchemy==1.1.4

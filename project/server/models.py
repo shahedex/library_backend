@@ -19,9 +19,7 @@ class User(db.Model):
 
     def __init__(self, email, password, first_name, last_name, is_admin):
         self.email = email
-        self.password = bcrypt.generate_password_hash(
-            password, app.config.get('BCRYPT_LOG_ROUNDS')
-        ).decode()
+        self.password = bcrypt.generate_password_hash(password).decode()
         self.registered_on = datetime.now()
         self.first_name = first_name
         self.last_name = last_name
@@ -32,7 +30,7 @@ class User(db.Model):
         """
         Encodes the JWT with payload by HMAC+SHA256
         """
-        app.logger.debug('encoding auth token')
+        # app.logger.debug('encoding auth token')
         try:
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=0, seconds=3600),
