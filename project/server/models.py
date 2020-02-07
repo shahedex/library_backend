@@ -97,3 +97,24 @@ class BlacklistToken(db.Model):
             return True
         else:
             return False
+
+
+class Books(db.Model):
+    __tablename__ = "books"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    author = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    isbn = db.Column(db.String(255), unique=True, nullable=False)
+    summary = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, name, author, created_at, isbn, summary):
+        self.name = name
+        self.author = author
+        self.created_at = datetime.now()
+        self.isbn = isbn
+        self.summary = summary
+
+    def __repr__(self):
+        return '<Book: name: {}'.format(self.name)
