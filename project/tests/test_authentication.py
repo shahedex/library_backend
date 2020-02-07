@@ -180,59 +180,16 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['message'] == 'Successfully logged out.')
             self.assertEqual(response.status_code, 200)
 
-    def test_invalid_logout(self):
-        with self.client:
-            resp_register = self.client.post(
-                '/auth/register',
-                data=json.dumps(dict(
-                    email='joe@gmail.com',
-                    password='123456'
-                )),
-                content_type='application/json',
-            )
-            data_register = json.loads(resp_register.data.decode())
-            self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(
-                data_register['message'] == 'Successfully registered.')
-            self.assertTrue(data_register['auth_token'])
-            self.assertTrue(resp_register.content_type == 'application/json')
-            self.assertEqual(resp_register.status_code, 201)
-            resp_login = self.client.post(
-                '/auth/login',
-                data=json.dumps(dict(
-                    email='joe@gmail.com',
-                    password='123456'
-                )),
-                content_type='application/json'
-            )
-            data_login = json.loads(resp_login.data.decode())
-            self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['message'] == 'Successfully logged in.')
-            self.assertTrue(data_login['auth_token'])
-            self.assertTrue(resp_login.content_type == 'application/json')
-            self.assertEqual(resp_login.status_code, 200)
-            time.sleep(6)
-            response = self.client.post(
-                '/auth/logout',
-                headers=dict(
-                    Authorization='Bearer ' + json.loads(
-                        resp_login.data.decode()
-                    )['auth_token']
-                )
-            )
-            data = json.loads(response.data.decode())
-            self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == 'Signature expired. Please log in again.')
-            self.assertEqual(response.status_code, 401)
-
     def test_valid_blacklisted_token_logout(self):
         with self.client:
             resp_register = self.client.post(
-                '/auth/register',
+                '/api/v1/auth/register',
                 data=json.dumps(dict(
-                    email='joe@gmail.com',
-                    password='123456'
+                    email='monty@gmail.com',
+                    password='123456',
+                    first_name='monty',
+                    last_name='python',
+                    is_admin='0'
                 )),
                 content_type='application/json',
             )
@@ -244,9 +201,9 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/v1/auth/login',
                 data=json.dumps(dict(
-                    email='joe@gmail.com',
+                    email='monty@gmail.com',
                     password='123456'
                 )),
                 content_type='application/json'
@@ -262,7 +219,7 @@ class TestAuthBlueprint(BaseTestCase):
             db.session.add(blacklist_token)
             db.session.commit()
             response = self.client.post(
-                '/auth/logout',
+                '/api/v1/auth/logout',
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
                         resp_login.data.decode()
@@ -276,12 +233,15 @@ class TestAuthBlueprint(BaseTestCase):
 
     def test_decode_auth_token(self):
         user = User(
-            email='test@test.com',
-            password='test'
+            email='monty@gmail.com',
+            password='123456',
+            first_name='monty',
+            last_name='python',
+            is_admin='0'
         )
         db.session.add(user)
         db.session.commit()
-        auth_token = user.encode_auth_token(user.id)
+        auth_token = user.encode_auth_token(user.id, user.is_admin)
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(User.decode_auth_token(
             auth_token.decode("utf-8")) == 1)

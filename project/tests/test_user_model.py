@@ -32,7 +32,7 @@ class TestUserModel(BaseTestCase):
         db.session.commit()
         auth_token = user.encode_auth_token(user.id, user.is_admin)
         self.assertTrue(isinstance(auth_token, bytes))
-        self.assertTrue(User.decode_auth_token(auth_token) == 1)
+        self.assertTrue(User.decode_auth_token(auth_token) == user.id)
 
 if __name__ == '__main__':
     unittest.main()

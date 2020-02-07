@@ -117,6 +117,48 @@ class LoginAPI(MethodView):
             }
             return make_response(jsonify(responseObject)), 500
 
+
+class LogoutAPI(MethodView):
+    def post(self):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            auth_token = auth_header.split(" ")[1]
+        else:
+            auth_token = ''
+        if auth_token:
+            resp = User.decode_auth_token(auth_token)
+            if not isinstance(resp, str):
+                user = User.query.filter_by(id=resp).first()
+                db.session.add(user)
+                blacklist_token = BlacklistToken(token=auth_token)
+                try:
+                    db.session.add(blacklist_token)
+                    db.session.commit()
+                    responseObject = {
+                        'status': 'success',
+                        'message': 'Successfully logged out.'
+                    }
+                    return make_response(jsonify(responseObject)), 200
+                except Exception as e:
+                    responseObject = {
+                        'status': 'fail',
+                        'message': e
+                    }
+                    return make_response(jsonify(responseObject)), 200
+            else:
+                responseObject = {
+                    'status': 'fail',
+                    'message': resp
+                }
+                return make_response(jsonify(responseObject)), 401
+        else:
+            responseObject = {
+                'status': 'fail',
+                'message': 'Provide a valid auth token.'
+            }
+            return make_response(jsonify(responseObject)), 403
+
+            
 registration_view = RegisterAPI.as_view('register_api')
 login_view = LoginAPI.as_view('login_api')
 logout_view = LogoutAPI.as_view('logout_api')
