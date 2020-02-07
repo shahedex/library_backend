@@ -58,6 +58,75 @@ class GetBookListAPI(MethodView):
             return make_response(jsonify(responseObject)), 401
 
 
+class SearchBookListAPI(MethodView):
+    def get(self):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            try:
+                auth_token = auth_header.split(" ")[1]
+            except IndexError:
+                responseObject = {
+                    'status': 'fail',
+                    'message': 'Bearer token malformed.'
+                }
+                return make_response(jsonify(responseObject)), 401
+        else:
+            auth_token = ''
+        if auth_token:
+            resp = User.decode_auth_token(auth_token)
+            if not isinstance(resp, str):
+                response_msg = []
+                search_query = request.args.get('query', None)
+
+                if not search_query:
+                    response_msg.append('search_query must be non-empty')
+                
+                if len(response_msg) > 0:
+                    responseObject = {
+                        'status': 'failed',
+                        'message': response_msg
+                    }
+                    return make_response(jsonify(responseObject)), 400
+                books = Books.query.filter(Books.name.like('%' + search_query + '%'))
+                booklist = []
+                if not books:
+                    responseObject = {
+                    'status': 'fail',
+                    'message': 'Sorry. No books are available named ' + search_query
+                    }
+                    return make_response(jsonify(responseObject)), 200
+                for book in books:
+                    booklist.append({
+                        'id': book.id,
+                        'name': book.name,
+                        'author': book.author,
+                        'isbn': book.isbn,
+                        'summary': book.summary
+                    })
+                if len(booklist) < 1:
+                    responseObject = {
+                    'status': 'fail',
+                    'message': 'Sorry. No books are available named ' + search_query
+                    }
+                    return make_response(jsonify(responseObject)), 400
+                responseObject = {
+                    'status': 'success',
+                    'data': booklist
+                }
+                return make_response(jsonify(responseObject)), 200
+            responseObject = {
+                'status': 'fail',
+                'message': resp
+            }
+            return make_response(jsonify(responseObject)), 401
+        else:
+            responseObject = {
+                'status': 'fail',
+                'message': 'Provide a valid auth token.'
+            }
+            return make_response(jsonify(responseObject)), 401
+
+
 class AddBookAPI(MethodView):
     def post(self):
         auth_header = request.headers.get('Authorization')
@@ -306,6 +375,7 @@ book_list_view = GetBookListAPI.as_view('book_list_api')
 add_book_view = AddBookAPI.as_view('add_book_api')
 delete_book_view = DeleteBookAPI.as_view('delete_book_api')
 update_book_view = UpdateBookInfoAPI.as_view('update_book_api')
+search_book_view = SearchBookListAPI.as_view('search_book_api')
 
 books_blueprint.add_url_rule(
     '/api/v1/books/getall',
@@ -329,4 +399,10 @@ books_blueprint.add_url_rule(
     '/api/v1/books/update',
     view_func=update_book_view,
     methods=['POST']
+)
+
+books_blueprint.add_url_rule(
+    '/api/v1/books/search',
+    view_func=search_book_view,
+    methods=['GET']
 )
